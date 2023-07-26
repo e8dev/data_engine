@@ -1,0 +1,24 @@
+[project]
+name = "data-engineering-test"
+version = "0.0.1"
+description = "Take home task for data engineers"
+authors = [
+    {name = "Tony Popov", email = "tony@calliper.app"},
+]
+dependencies = [
+    "faker>=19.1.0",
+    "pandas>=2.0.3",
+    "sqlalchemy>=2.0.19",
+    "psycopg2-binary>=2.9.6",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[tool]
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "setuptools>=68.0.0",
+    "memory-profiler>=0.61.0",
+    "matplotlib>=3.7.2",
+]

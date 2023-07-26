@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: data-engineering-test
+Version: 0.0.1
+Summary: Take home task for data engineers
+Author-email: Tony Popov <tony@calliper.app>
+License: MIT
+Requires-Python: >=3.11
