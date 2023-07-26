@@ -9,6 +9,10 @@ from .coordinates_to_country import coordinates_to_country
 from ..repositories.events_repository import read_events
 from ..repositories.results_repository import save_results
 
+MEMORY_THRESHOLD = 150
+MEMORY_MULTIPLIER = 0.1
+LIMIT_STEP = 1000
+
 '''
 for hard limit
 #linux
@@ -56,8 +60,9 @@ def process_data_old_school(limit, offset):
     while True:
 
         events_dataframe = read_events(limit, offset)
-
-        #print(events_dataframe.shape)
+        
+        if events_dataframe.empty:
+            break
 
         events_dataframe['country'] = events_dataframe['coordinates'].apply(coordinates_to_country)
         events_dataframe['created_at'] = pd.to_datetime(events_dataframe['created_at'])
@@ -69,29 +74,20 @@ def process_data_old_school(limit, offset):
 
         #measure memory
         mem_usage = check_memory_mb()
-        multiplier = 0.1 #10% as threshold
-        memory_threshold = 150 #we will use 150 +/- 10% because memory is a floating value
-        min_memory = memory_threshold - mem_usage*multiplier
-        max_memory = memory_threshold + mem_usage*multiplier
-        limit_step = 5000 #we can also measure how much limit influence on memory for example 1000 records takes 10mb, etc
 
-        if(mem_usage < max_memory and mem_usage > min_memory):
-            offset += limit
-            pass
-        if(mem_usage < min_memory):
-            limit = limit + limit_step
-            offset += limit
-        if(mem_usage > max_memory):
-            limit = limit - limit_step
-            offset += limit
-            pass
+        if mem_usage > MEMORY_THRESHOLD:
+            if(limit >LIMIT_STEP):
+                limit -= LIMIT_STEP
+        else:
+            limit += LIMIT_STEP
 
-        print("memory")
-        print(mem_usage)
-        print(limit, offset)
+        # Update offset
+        offset += limit
 
-        if events_dataframe.empty:
-            break
+        # Logging memory and limit/offset values
+        print("Memory Usage:", mem_usage)
+        print("Limit:", limit, "Offset:", offset)
+
 
     return 
 
